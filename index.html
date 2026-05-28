@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Holistica — Дашборд куратора</title>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c1:      #173f35;
+  --c1l:     #2a6b5a;
+  --c1ll:    #e8f5f1;
+  --c2:      #9e007e;
+  --c2l:     #fdf0fa;
+  --bg:      #f4f7f5;
+  --white:   #ffffff;
+  --text:    #1a1a1a;
+  --muted:   #6b7280;
+  --border:  #e2ebe7;
+  --red:     #dc2626;
+  --redbg:   #fef2f2;
+  --green:   #16a34a;
+  --greenbg: #f0fdf4;
+  --amber:   #d97706;
+  --amberbg: #fffbeb;
+  --font:    'Commissioner', sans-serif;
+  --font2:   'Cormorant Garamond', serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── ТОПБАР ── */
+.topbar{background:var(--c1);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:12px;}
+.topbar-brand span{font-family:var(--font2);font-size:20px;font-weight:600;color:var(--white);}
+.topbar-brand small{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;}
+.topbar-right{display:flex;align-items:center;gap:20px;}
+.topbar-count{font-size:13px;color:rgba(255,255,255,.6);}
+.topbar-count span{color:var(--white);font-weight:600;}
+
+/* ── КОНТЕНТ ── */
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 60px);}
+
+/* ── ЛЕВАЯ ПАНЕЛЬ ── */
+.sidebar{background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 60px);position:sticky;top:60px;}
+.search-wrap{padding:16px;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;}
+.search-box input{border:none;background:transparent;font-family:var(--font);font-size:14px;color:var(--text);width:100%;outline:none;}
+.search-box svg{flex-shrink:0;color:var(--muted);}
+.filters{padding:0 16px 12px;display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted);background:var(--white);cursor:pointer;transition:all .15s;}
+.filter-btn:hover{border-color:var(--c1);color:var(--c1);}
+.filter-btn.active{background:var(--c1);border-color:var(--c1);color:var(--white);}
+.participants-list{flex:1;overflow-y:auto;padding:0 8px 16px;}
+.participant-item{padding:12px 10px;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:2px;border:1px solid transparent;}
+.participant-item:hover{background:var(--c1ll);}
+.participant-item.active{background:var(--c1ll);border-color:var(--c1);}
+.pi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;}
+.pi-name{font-size:14px;font-weight:600;color:var(--text);}
+.pi-date{font-size:11px;color:var(--muted);}
+.pi-email{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.pi-bottom{display:flex;gap:6px;align-items:center;}
+.proto-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.proto-vyaloe{background:#e8f5f1;color:#0f5c3a;}
+.proto-vospalennoe{background:#fff0f0;color:#b91c1c;}
+.proto-chuvstvitelnoe{background:#f3f0ff;color:#5b21b6;}
+.proto-smeshannoe{background:#fffbeb;color:#92400e;}
+.proto-none{background:#f3f4f6;color:#6b7280;}
+.flag-dot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.status-new{background:#f59e0b;}
+.status-done{background:var(--green);}
+
+/* ── ПРАВАЯ ПАНЕЛЬ ── */
+.main{padding:32px;overflow-y:auto;height:calc(100vh - 60px);}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:var(--muted);}
+.empty-state svg{opacity:.3;}
+.empty-state p{font-size:15px;}
+
+/* ── КАРТОЧКА УЧАСТНИКА ── */
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;gap:16px;flex-wrap:wrap;}
+.card-person{display:flex;align-items:center;gap:14px;}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--c1);display:flex;align-items:center;justify-content:center;font-family:var(--font2);font-size:18px;font-weight:600;color:var(--white);flex-shrink:0;}
+.card-name{font-family:var(--font2);font-size:24px;font-weight:600;color:var(--c1);margin-bottom:2px;}
+.card-email{font-size:13px;color:var(--muted);}
+.card-actions{display:flex;gap:8px;}
+.btn{padding:9px 18px;border-radius:9px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .16s;border:none;}
+.btn-primary{background:var(--c1);color:var(--white);}
+.btn-primary:hover{background:var(--c1l);}
+.btn-outline{background:var(--white);color:var(--c1);border:1px solid var(--c1);}
+.btn-outline:hover{background:var(--c1ll);}
+.btn-purple{background:var(--c2);color:var(--white);}
+.btn-purple:hover{opacity:.9;}
+.btn:disabled{opacity:.5;cursor:default;}
+
+/* ── МЕТРИКИ ── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.metric{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.metric-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:4px;}
+.metric-val{font-family:var(--font2);font-size:24px;font-weight:600;color:var(--c1);}
+.metric-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── КРАСНЫЙ ФЛАГ ── */
+.red-flag-bar{background:var(--redbg);border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.red-flag-bar svg{flex-shrink:0;color:var(--red);}
+.red-flag-bar span{font-size:13px;font-weight:600;color:var(--red);}
+
+/* ── БЛОКИ СИМПТОМОВ ── */
+.blocks-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+.block-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.block-card.full{grid-column:1/-1;}
+.block-head{padding:10px 16px;background:var(--c1ll);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.block-head-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--c1);}
+.block-body{padding:14px 16px;}
+.symptom-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--bg);font-size:13px;gap:12px;}
+.symptom-row:last-child{border-bottom:none;padding-bottom:0;}
+.symptom-name{color:var(--text);flex:1;line-height:1.4;}
+.symptom-val{color:var(--muted);font-size:12px;white-space:nowrap;font-weight:600;}
+.symptom-val.freq-high{color:var(--red);}
+.symptom-val.freq-med{color:var(--amber);}
+.symptom-val.freq-low{color:var(--green);}
+.empty-block{font-size:13px;color:var(--muted);font-style:italic;}
+
+/* ── ПАНЕЛЬ КУРАТОРА ── */
+.curator-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;}
+.curator-panel-title{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--c2);margin-bottom:16px;}
+.curator-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field-group{display:flex;flex-direction:column;gap:6px;}
+.field-group.full{grid-column:1/-1;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.field-select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--white);outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.field-select:focus{border-color:var(--c2);}
+.field-textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--white);outline:none;resize:vertical;min-height:80px;transition:border-color .15s;}
+.field-textarea:focus{border-color:var(--c2);}
+.save-row{display:flex;align-items:center;gap:12px;margin-top:16px;}
+.save-msg{font-size:13px;font-weight:600;}
+.save-msg.ok{color:var(--green);}
+.save-msg.err{color:var(--red);}
+
+/* ── ДИАГНОЗЫ ── */
+.diag-list{display:flex;flex-wrap:wrap;gap:6px;}
+.diag-chip{background:var(--c1ll);color:var(--c1);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;}
+
+/* ── ЗАГРУЗКА ── */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--muted);}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--c2);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── АДАПТИВ ── */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{height:auto;position:static;}
+  .main{height:auto;}
+  .blocks-grid{grid-template-columns:1fr;}
+  .metrics{grid-template-columns:1fr 1fr;}
+  .curator-fields{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div>
+      <div><span>Holistica DOC</span></div>
+      <small>Дашборд куратора · ЖКТ</small>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-count">Участников: <span id="total-count">—</span></div>
+    <button class="btn btn-outline" style="color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.3);background:transparent;font-size:12px;" onclick="loadData()">↻ Обновить</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ЛЕВАЯ ПАНЕЛЬ -->
+  <div class="sidebar">
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search" placeholder="Поиск по имени или email..." oninput="renderList()">
+      </div>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter(this,'all')">Все</button>
+      <button class="filter-btn" data-filter="new" onclick="setFilter(this,'new')">Новые</button>
+      <button class="filter-btn" data-filter="done" onclick="setFilter(this,'done')">Проверены</button>
+      <button class="filter-btn" data-filter="flag" onclick="setFilter(this,'flag')">🔴 Флаги</button>
+    </div>
+    <div class="participants-list" id="list">
+      <div class="loading"><div class="spinner"></div><span>Загрузка...</span></div>
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ ПАНЕЛЬ -->
+  <div class="main" id="main">
+    <div class="empty-state">
+      <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <p>Выберите участника из списка</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// !! ЗАМЕНИТЕ на URL вашего Apps Script !!
+const API_URL = 'https://script.google.com/macros/s/AKfycbxjX2TFSxzvT7zNJNzS9LCuQeif3ncM8JCoBMMYxLJOl_2GsQZFUO3tBlllwaYiWjhTAA/exec';
+
+let allData = [];
+let currentFilter = 'all';
+let currentRow = null;
+
+// ── ЗАГРУЗКА ДАННЫХ ──────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch(API_URL + '?action=get');
+    const json = await res.json();
+    allData = json.rows || [];
+    document.getElementById('total-count').textContent = allData.length;
+    renderList();
+    if (currentRow !== null) {
+      const updated = allData.find(r => r.rowIndex === currentRow);
+      if (updated) renderCard(updated);
+    }
+  } catch(e) {
+    document.getElementById('list').innerHTML = `<div style="padding:20px;text-align:center;color:#dc2626;font-size:13px;">Ошибка загрузки.<br>Проверьте подключение к Apps Script.</div>`;
+  }
+}
+
+// ── ФИЛЬТР ──────────────────────────────────────────────
+function setFilter(btn, val) {
+  currentFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+// ── СПИСОК ──────────────────────────────────────────────
+function renderList() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let rows = allData.filter(r => {
+    const match = !q || (r.fio||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q);
+    if (!match) return false;
+    if (currentFilter === 'new') return !(r.curator_protocol||'').trim();
+    if (currentFilter === 'done') return !!(r.curator_protocol||'').trim();
+    if (currentFilter === 'flag') return r.red_flags && r.red_flags !== 'Нет';
+    return true;
+  });
+
+  if (!rows.length) {
+    document.getElementById('list').innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Ничего не найдено</div>`;
+    return;
+  }
+
+  document.getElementById('list').innerHTML = rows.map(r => {
+    const initials = getInitials(r.fio);
+    const proto = r.curator_protocol || '';
+    const isDone = !!proto.trim();
+    const hasFlag = r.red_flags && r.red_flags !== 'Нет';
+    const date = formatDate(r.timestamp);
+    return `<div class="participant-item${r.rowIndex === currentRow ? ' active' : ''}" onclick="renderCard(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+      <div class="pi-top">
+        <div class="pi-name">${r.fio || '—'}</div>
+        <div class="pi-date">${date}</div>
+      </div>
+      <div class="pi-email">${r.email || ''}</div>
+      <div class="pi-bottom">
+        <span class="proto-badge ${getProtoClass(proto)}">${proto || 'Не назначен'}</span>
+        ${r.curator_name ? `<span style="font-size:11px;color:var(--muted);font-weight:600;">${r.curator_name}</span>` : ''}
+        ${hasFlag ? '<span class="flag-dot" title="Красный флаг"></span>' : ''}
+        <span class="status-dot ${isDone ? 'status-done' : 'status-new'}" title="${isDone ? 'Проверен' : 'Новый'}"></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── КАРТОЧКА ──────────────────────────────────────────────
+function renderCard(row) {
+  currentRow = row.rowIndex;
+  renderList();
+
+  const main = document.getElementById('main');
+  const hasFlag = row.red_flags && row.red_flags !== 'Нет';
+
+  const metrics = [
+    { label: 'Возраст', val: row.vozrast ? row.vozrast + ' лет' : '—', sub: row.pol || '' },
+    { label: 'ИМТ', val: row.bmi || '—', sub: bmiLabel(row.bmi) },
+    { label: 'Рост / Вес', val: row.rost && row.ves ? row.rost + ' / ' + row.ves : '—', sub: 'см / кг' },
+    { label: 'Талия', val: row.taliya ? row.taliya + ' см' : '—', sub: row.taliya > 80 ? 'Выше нормы' : 'Норма' },
+  ];
+
+  const blocks = [
+    { title: 'Боли в животе', data: row.s_boli, icon: '🫁' },
+    { title: 'Тяжесть и чувствительность', data: row.s_tyazhest, icon: '⚖️' },
+    { title: 'Изжога и привкус', data: row.s_izjoga, icon: '🔥' },
+    { title: 'Тошнота', data: row.s_toshnota, icon: '🌀' },
+    { title: 'Вздутие', data: row.s_vzdutie, icon: '💨', extra: row.bloating_products ? `Триггеры: ${row.bloating_products}` : null },
+    { title: 'Стул', data: row.s_stul, icon: '📋' },
+    { title: 'Кожа и волосы', data: row.s_kozha, icon: '✨' },
+    { title: 'Общее состояние', data: row.s_obshchee, icon: '🩺', full: true },
+  ];
+
+  main.innerHTML = `
+    <div class="card-header">
+      <div class="card-person">
+        <div class="avatar">${getInitials(row.fio)}</div>
+        <div>
+          <div class="card-name">${row.fio || '—'}</div>
+          <div class="card-email">${row.email || ''}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-outline" onclick="loadData()">↻ Обновить</button>
+      </div>
+    </div>
+
+    ${hasFlag ? `<div class="red-flag-bar">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Красный флаг: ${row.red_flags}</span>
+    </div>` : ''}
+
+    <div class="metrics">
+      ${metrics.map(m => `<div class="metric">
+        <div class="metric-label">${m.label}</div>
+        <div class="metric-val">${m.val}</div>
+        ${m.sub ? `<div class="metric-sub">${m.sub}</div>` : ''}
+      </div>`).join('')}
+    </div>
+
+    ${row.diagnoses ? `<div class="block-card" style="margin-bottom:14px;">
+      <div class="block-head"><span class="block-head-title">Диагнозы</span></div>
+      <div class="block-body"><div class="diag-list">${row.diagnoses.split('\n').filter(Boolean).map(d => `<span class="diag-chip">${d.trim()}</span>`).join('')}</div></div>
+    </div>` : ''}
+
+    <!-- ПАНЕЛЬ КУРАТОРА -->
+    <div class="curator-panel">
+      <div class="curator-panel-title">Оценка куратора</div>
+      <div class="curator-fields">
+        <div class="field-group">
+          <label class="field-label">Куратор</label>
+          <select class="field-select" id="sel-curator">
+            <option value="">— Выберите куратора —</option>
+            <option value="Евгения Артемьева" ${row.curator_name === 'Евгения Артемьева' ? 'selected' : ''}>Евгения Артемьева</option>
+            <option value="Анна Верещегина" ${row.curator_name === 'Анна Верещегина' ? 'selected' : ''}>Анна Верещегина</option>
+            <option value="Елена Бочкарева" ${row.curator_name === 'Елена Бочкарева' ? 'selected' : ''}>Елена Бочкарева</option>
+            <option value="Наталья Сербина" ${row.curator_name === 'Наталья Сербина' ? 'selected' : ''}>Наталья Сербина</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Протокол</label>
+          <select class="field-select" id="sel-protocol">
+            <option value="">— Выберите протокол —</option>
+            <option value="Вялое пищеварение" ${row.curator_protocol === 'Вялое пищеварение' ? 'selected' : ''}>Вялое пищеварение</option>
+            <option value="Воспалённое пищеварение" ${row.curator_protocol === 'Воспалённое пищеварение' ? 'selected' : ''}>Воспалённое пищеварение</option>
+            <option value="Чувствительное пищеварение" ${row.curator_protocol === 'Чувствительное пищеварение' ? 'selected' : ''}>Чувствительное пищеварение</option>
+            <option value="Смешанный тип" ${row.curator_protocol === 'Смешанный тип' ? 'selected' : ''}>Смешанный тип</option>
+          </select>
+        </div>
+        <div class="field-group full">
+          <label class="field-label">Комментарий куратора</label>
+          <textarea class="field-textarea" id="sel-comment" placeholder="Введите комментарий...">${row.curator_comment || ''}</textarea>
+        </div>
+      </div>
+      <div class="save-row">
+        <button class="btn btn-purple" onclick="saveRow(${row.rowIndex})">Сохранить</button>
+        <span class="save-msg" id="save-msg"></span>
+      </div>
+    </div>
+
+    <!-- СИМПТОМЫ ПО БЛОКАМ -->
+    <div class="blocks-grid">
+      ${blocks.map(b => renderBlock(b)).join('')}
+    </div>
+
+    <!-- ЛЕКАРСТВА И ЦЕЛИ -->
+    <div class="blocks-grid">
+      ${row.meds ? `<div class="block-card">
+        <div class="block-head"><span class="block-head-title">Лекарства</span></div>
+        <div class="block-body"><div style="font-size:14px;line-height:1.6;color:var(--text);">${row.meds}</div></div>
+      </div>` : ''}
+      ${row.goals ? `<div class="block-card">
+        <div class="block-head"><span class="block-head-title">Цели на программе</span></div>
+        <div class="block-body"><div style="font-size:14px;line-height:1.6;color:var(--text);">${row.goals}</div></div>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function renderBlock(b) {
+  const lines = (b.data || '').split('\n').filter(Boolean);
+  const body = lines.length
+    ? lines.map(l => {
+        const parts = l.split(': ');
+        const name = parts[0] || l;
+        const val = parts.slice(1).join(': ');
+        const cls = freqClass(val);
+        return `<div class="symptom-row"><span class="symptom-name">${name}</span><span class="symptom-val ${cls}">${val}</span></div>`;
+      }).join('') + (b.extra ? `<div class="symptom-row"><span class="symptom-name" style="color:var(--muted);font-style:italic;">${b.extra}</span></div>` : '')
+    : `<div class="empty-block">Не отмечено</div>`;
+  return `<div class="block-card${b.full ? ' full' : ''}">
+    <div class="block-head"><span class="block-head-title">${b.icon} ${b.title}</span></div>
+    <div class="block-body">${body}</div>
+  </div>`;
+}
+
+// ── СОХРАНЕНИЕ ────────────────────────────────────────────
+async function saveRow(rowIndex) {
+  const protocol = document.getElementById('sel-protocol').value;
+  const comment  = document.getElementById('sel-comment').value;
+  const curator  = document.getElementById('sel-curator').value;
+  const msg = document.getElementById('save-msg');
+  msg.textContent = 'Сохраняю...';
+  msg.className = 'save-msg';
+
+  try {
+    await fetch(API_URL + '?action=save', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rowIndex, curator_protocol: protocol, curator_comment: comment, curator_name: curator })
+    });
+    msg.textContent = '✓ Сохранено';
+    msg.className = 'save-msg ok';
+    const idx = allData.findIndex(r => r.rowIndex === rowIndex);
+    if (idx > -1) {
+      allData[idx].curator_protocol = protocol;
+      allData[idx].curator_comment = comment;
+      allData[idx].curator_name = curator;
+    }
+    renderList();
+    setTimeout(() => { if(msg) msg.textContent = ''; }, 3000);
+  } catch(e) {
+    msg.textContent = '✗ Ошибка сохранения';
+    msg.className = 'save-msg err';
+  }
+}
+
+// ── ХЕЛПЕРЫ ──────────────────────────────────────────────
+function getInitials(fio) {
+  if (!fio) return '?';
+  const p = fio.trim().split(/\s+/);
+  return (p[0]?.[0] || '') + (p[1]?.[0] || '');
+}
+
+function formatDate(ts) {
+  if (!ts) return '';
+  try {
+    const d = new Date(ts);
+    return d.toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'2-digit' });
+  } catch { return ''; }
+}
+
+function bmiLabel(bmi) {
+  const b = parseFloat(bmi);
+  if (!b) return '';
+  if (b < 18.5) return 'Дефицит';
+  if (b < 25) return 'Норма';
+  if (b < 30) return 'Избыточный';
+  return 'Ожирение';
+}
+
+function getProtoClass(proto) {
+  if (!proto) return 'proto-none';
+  if (proto.includes('Вялое')) return 'proto-vyaloe';
+  if (proto.includes('Воспал')) return 'proto-vospalennoe';
+  if (proto.includes('Чувств')) return 'proto-chuvstvitelnoe';
+  if (proto.includes('Смеш')) return 'proto-smeshannoe';
+  return 'proto-none';
+}
+
+function freqClass(val) {
+  if (!val) return '';
+  if (val.includes('Каждый') || val.includes('Еженедельно') || val === 'Часто' || val === 'Всегда') return 'freq-high';
+  if (val.includes('Несколько') || val === 'Изредка' || val === 'Иногда') return 'freq-med';
+  return 'freq-low';
+}
+
+// ── СТАРТ ────────────────────────────────────────────────
+loadData();
+// Автообновление каждые 60 секунд
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>
