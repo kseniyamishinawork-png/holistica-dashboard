@@ -144,6 +144,37 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .diag-list{display:flex;flex-wrap:wrap;gap:6px;}
 .diag-chip{background:var(--c1ll);color:var(--c1);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;}
 
+/* ── ТОЧКА Б ── */
+.point-b-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(158,0,126,.1);color:var(--c2);}
+.point-b-section{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.point-b-head{padding:12px 20px;background:linear-gradient(135deg,rgba(158,0,126,.08),rgba(196,0,156,.04));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.point-b-title{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--c2);}
+.point-b-body{padding:14px 20px;}
+.compare-block-mini{margin-bottom:16px;}
+.compare-block-mini:last-child{margin-bottom:0;}
+.compare-block-mini-head{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.compare-row-mini{display:grid;grid-template-columns:1fr 100px 20px 100px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--bg);font-size:12px;}
+.compare-row-mini:last-child{border-bottom:none;}
+.compare-row-mini.better{background:rgba(22,163,74,.03);border-radius:4px;padding:5px 4px;}
+.compare-row-mini.worse{background:rgba(220,38,38,.03);border-radius:4px;padding:5px 4px;}
+.cval{text-align:center;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;}
+.cval-a{background:var(--c1ll);color:var(--c1);}
+.cval-b{background:rgba(158,0,126,.08);color:var(--c2);}
+.carrow{text-align:center;font-weight:700;font-size:13px;}
+.overall-mini{display:flex;gap:10px;margin-bottom:14px;}
+.overall-mini-stat{flex:1;text-align:center;padding:10px 8px;border-radius:10px;}
+.overall-mini-stat.better{background:var(--greenbg);}
+.overall-mini-stat.worse{background:var(--redbg);}
+.overall-mini-stat.same{background:var(--amberbg);}
+.overall-mini-num{font-size:22px;font-weight:700;}
+.overall-mini-stat.better .overall-mini-num{color:var(--green);}
+.overall-mini-stat.worse .overall-mini-num{color:var(--red);}
+.overall-mini-stat.same .overall-mini-num{color:var(--amber);}
+.overall-mini-lbl{font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;}
+.weight-compare{display:flex;gap:16px;align-items:center;background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:14px;flex-wrap:wrap;}
+.weight-val{font-size:13px;font-weight:600;}
+.weight-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+
 /* ── ЗАГРУЗКА ── */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--muted);}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--c2);border-radius:50%;animation:spin .7s linear infinite;}
@@ -190,12 +221,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="filter-btn" data-filter="new" onclick="setFilter(this,'new')">Новые</button>
       <button class="filter-btn" data-filter="done" onclick="setFilter(this,'done')">Проверены</button>
       <button class="filter-btn" data-filter="flag" onclick="setFilter(this,'flag')">🔴 Флаги</button>
+      <button class="filter-btn" data-filter="has_b" onclick="setFilter(this,'has_b')">📊 Есть Б</button>
+      <button class="filter-btn" data-filter="better" onclick="setFilter(this,'better')" style="color:var(--green);">✓ Улучшение</button>
+      <button class="filter-btn" data-filter="worse" onclick="setFilter(this,'worse')" style="color:var(--red);">↑ Ухудшение</button>
     </div>
     <div style="padding:0 16px 12px;display:flex;flex-direction:column;gap:8px;">
       <select class="filter-select" id="filter-curator" onchange="renderList()">
         <option value="">Все кураторы</option>
         <option value="Евгения Артемьева">Евгения Артемьева</option>
-        <option value="Анна Верещагина">Анна Верещагина</option>
+        <option value="Анна Верещегина">Анна Верещегина</option>
         <option value="Елена Бочкарева">Елена Бочкарева</option>
         <option value="Наталья Сербина">Наталья Сербина</option>
         <option value="Марина Комкова">Марина Комкова</option>
@@ -238,9 +272,23 @@ let currentRow = null;
 // ── ЗАГРУЗКА ДАННЫХ ──────────────────────────────────────
 async function loadData() {
   try {
-    const res = await fetch(API_URL + '?action=get');
-    const json = await res.json();
-    allData = json.rows || [];
+    const [resA, resB] = await Promise.all([
+      fetch(API_URL + '?action=get'),
+      fetch(API_URL + '?action=get_b')
+    ]);
+    const jsonA = await resA.json();
+    const jsonB = await resB.json();
+
+    const rowsB = jsonB.rows || [];
+    // Создаём карту email → данные Б
+    const mapB = {};
+    rowsB.forEach(r => { if(r.email) mapB[r.email.toLowerCase().trim()] = r; });
+
+    allData = (jsonA.rows || []).map(r => {
+      const bRow = mapB[(r.email||'').toLowerCase().trim()];
+      return { ...r, point_b: bRow || null };
+    });
+
     document.getElementById('total-count').textContent = allData.length;
     renderList();
     if (currentRow !== null) {
@@ -269,9 +317,12 @@ function renderList() {
   let rows = allData.filter(r => {
     const matchQ = !q || (r.fio||'').toLowerCase().includes(q) || (r.email||'').toLowerCase().includes(q);
     if (!matchQ) return false;
-    if (currentFilter === 'new')  return !(r.curator_protocol||'').trim();
-    if (currentFilter === 'done') return !!(r.curator_protocol||'').trim();
-    if (currentFilter === 'flag') return r.red_flags && r.red_flags !== 'Нет';
+    if (currentFilter === 'new')    return !(r.curator_protocol||'').trim();
+    if (currentFilter === 'done')   return !!(r.curator_protocol||'').trim();
+    if (currentFilter === 'flag')   return r.red_flags && r.red_flags !== 'Нет';
+    if (currentFilter === 'has_b')  return !!r.point_b;
+    if (currentFilter === 'better') return !!r.point_b && calcDynamic(r).better > calcDynamic(r).worse;
+    if (currentFilter === 'worse')  return !!r.point_b && calcDynamic(r).worse > calcDynamic(r).better;
     return true;
   }).filter(r => {
     if (curator  && (r.curator_name||'') !== curator)          return false;
@@ -309,6 +360,7 @@ function renderList() {
       <div class="pi-email">${r.email || ''}</div>
       <div class="pi-bottom">
         <span class="proto-badge ${getProtoClass(proto)}">${proto || 'Не назначен'}</span>
+        ${r.point_b ? `<span class="point-b-badge">📊 Б</span>` : ''}
         ${r.curator_name ? `<span style="font-size:11px;color:var(--muted);font-weight:600;">${r.curator_name}</span>` : ''}
         ${hasFlag ? '<span class="flag-dot" title="Красный флаг"></span>' : ''}
         <span class="status-dot ${isDone ? 'status-done' : 'status-new'}" title="${isDone ? 'Проверен' : 'Новый'}"></span>
@@ -385,7 +437,7 @@ function renderCard(row) {
           <select class="field-select" id="sel-curator">
             <option value="">— Выберите куратора —</option>
             <option value="Евгения Артемьева" ${row.curator_name === 'Евгения Артемьева' ? 'selected' : ''}>Евгения Артемьева</option>
-            <option value="Анна Верещагина" ${row.curator_name === 'Анна Верещагина' ? 'selected' : ''}>Анна Верещагина</option>
+            <option value="Анна Верещегина" ${row.curator_name === 'Анна Верещегина' ? 'selected' : ''}>Анна Верещегина</option>
             <option value="Елена Бочкарева" ${row.curator_name === 'Елена Бочкарева' ? 'selected' : ''}>Елена Бочкарева</option>
             <option value="Наталья Сербина" ${row.curator_name === 'Наталья Сербина' ? 'selected' : ''}>Наталья Сербина</option>
             <option value="Марина Комкова" ${row.curator_name === 'Марина Комкова' ? 'selected' : ''}>Марина Комкова</option>
@@ -431,6 +483,9 @@ function renderCard(row) {
         <div class="block-body"><div style="font-size:14px;line-height:1.6;color:var(--text);">${row.goals}</div></div>
       </div>` : ''}
     </div>
+
+    <!-- ТОЧКА Б -->
+    ${renderPointB(row)}
   `;
 }
 
@@ -448,6 +503,153 @@ function renderBlock(b) {
   return `<div class="block-card${b.full ? ' full' : ''}">
     <div class="block-head"><span class="block-head-title">${b.icon} ${b.title}</span></div>
     <div class="block-body">${body}</div>
+  </div>`;
+}
+
+// ── ТОЧКА Б — СРАВНЕНИЕ ──────────────────────────────────
+const FREQ = {'≤ 1 раза в месяц':1,'Несколько раз в месяц':2,'Еженедельно':3,'Каждый день':4,'Иногда':1,'Всегда':2,'Изредка':1,'Часто':2,'Есть реакция, не провоцирую':1,'Да':1};
+const freqVal = s => FREQ[s] || 0;
+
+function parseBlockStr(str) {
+  if (!str) return {};
+  const result = {};
+  String(str).split(/\r?\n/).forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx > -1) {
+      result[line.substring(0, idx).trim()] = line.substring(idx + 1).trim();
+    }
+  });
+  return result;
+}
+
+const BLOCK_PAIRS = [
+  ['Боли в животе',            's_boli',     's_boli'],
+  ['Тяжесть и чувствительность','s_tyazhest','s_tyazhest'],
+  ['Изжога и привкус',         's_izjoga',   's_izjoga'],
+  ['Тошнота',                  's_toshnota', 's_toshnota'],
+  ['Вздутие',                  's_vzdutie',  's_vzdutie'],
+  ['Стул',                     's_stul',     's_stul'],
+  ['Кожа и волосы',            's_kozha',    's_kozha'],
+  ['Общее состояние',          's_obshchee', 's_obshchee'],
+];
+
+function calcDynamic(row) {
+  if (!row.point_b) return { better: 0, worse: 0, same: 0 };
+  let better = 0, worse = 0, same = 0;
+  BLOCK_PAIRS.forEach(([,aField, bField]) => {
+    const aMap = parseBlockStr(row[aField] || '');
+    const bMap = parseBlockStr(row.point_b[bField] || '');
+    const keys = new Set([...Object.keys(aMap), ...Object.keys(bMap)]);
+    keys.forEach(k => {
+      const aV = freqVal(aMap[k] || '');
+      const bV = freqVal(bMap[k] || '');
+      const aHas = !!aMap[k], bHas = !!bMap[k];
+      if (aHas && !bHas) better++;
+      else if (!aHas && bHas) worse++;
+      else if (aV > bV) better++;
+      else if (aV < bV) worse++;
+      else same++;
+    });
+  });
+  return { better, worse, same };
+}
+
+function renderPointB(row) {
+  if (!row.point_b) {
+    return `<div class="point-b-section">
+      <div class="point-b-head">
+        <div class="point-b-title">📊 Точка Б</div>
+      </div>
+      <div class="point-b-body" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">
+        Участник ещё не заполнил финальную анкету
+      </div>
+    </div>`;
+  }
+
+  const b = row.point_b;
+  const dyn = calcDynamic(row);
+  const overallText = dyn.better > dyn.worse ? '✓ Положительная динамика' : dyn.worse > dyn.better ? '↑ Есть ухудшения' : '→ Стабильно';
+  const overallColor = dyn.better > dyn.worse ? 'var(--green)' : dyn.worse > dyn.better ? 'var(--red)' : 'var(--amber)';
+
+  // Изменение веса
+  let weightHTML = '';
+  if (row.ves && b.ves) {
+    const diff = (parseFloat(b.ves) - parseFloat(row.ves)).toFixed(1);
+    const wcolor = diff < 0 ? 'var(--green)' : diff > 0 ? 'var(--red)' : 'var(--amber)';
+    const sign = diff > 0 ? '+' : '';
+    weightHTML = `<div class="weight-compare">
+      <div><div class="weight-label">Вес А</div><div class="weight-val">${row.ves} кг</div></div>
+      <div style="font-size:20px;font-weight:700;color:${wcolor};">${sign}${diff} кг</div>
+      <div><div class="weight-label">Вес Б</div><div class="weight-val" style="color:${wcolor};">${b.ves} кг</div></div>
+      ${b.bmi ? `<div><div class="weight-label">ИМТ Б</div><div class="weight-val">${b.bmi}</div></div>` : ''}
+    </div>`;
+  }
+
+  // Блоки сравнения
+  let blocksHTML = '';
+  BLOCK_PAIRS.forEach(([title, aField, bField]) => {
+    const aMap = parseBlockStr(row[aField] || '');
+    const bMap = parseBlockStr(b[bField] || '');
+    const keys = new Set([...Object.keys(aMap), ...Object.keys(bMap)]);
+    if (!keys.size) return;
+
+    let blockBetter = 0, blockWorse = 0;
+    let rowsHTML = '';
+    keys.forEach(k => {
+      const aVal = aMap[k] || '';
+      const bVal = bMap[k] || '';
+      const aV = freqVal(aVal), bV = freqVal(bVal);
+      let arrow, color, cls = '';
+      if (aVal && !bVal)     { blockBetter++; arrow = '✓'; color = 'var(--green)'; cls = 'better'; }
+      else if (!aVal && bVal){ blockWorse++;  arrow = '↑'; color = 'var(--red)';   cls = 'worse'; }
+      else if (aV > bV)      { blockBetter++; arrow = '↓'; color = 'var(--green)'; cls = 'better'; }
+      else if (aV < bV)      { blockWorse++;  arrow = '↑'; color = 'var(--red)';   cls = 'worse'; }
+      else                   { arrow = '→';   color = 'var(--amber)'; }
+
+      rowsHTML += `<div class="compare-row-mini ${cls}">
+        <div style="font-size:12px;color:var(--text);">${k}</div>
+        <div class="cval cval-a">${aVal || '—'}</div>
+        <div class="carrow" style="color:${color};">${arrow}</div>
+        <div class="cval cval-b" style="${!bVal && aVal ? 'color:var(--green);' : ''}">${bVal || (!aVal ? '—' : 'нет ✓')}</div>
+      </div>`;
+    });
+
+    const badgeText = blockBetter > blockWorse ? '✓' : blockWorse > blockBetter ? '↑' : '→';
+    const badgeColor = blockBetter > blockWorse ? 'var(--green)' : blockWorse > blockBetter ? 'var(--red)' : 'var(--amber)';
+
+    blocksHTML += `<div class="compare-block-mini">
+      <div class="compare-block-mini-head">
+        <span>${title}</span>
+        <span style="color:${badgeColor};font-size:14px;font-weight:700;">${badgeText}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);display:grid;grid-template-columns:1fr 100px 20px 100px;gap:8px;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">
+        <span></span><span style="text-align:center;">Точка А</span><span></span><span style="text-align:center;">Точка Б</span>
+      </div>
+      ${rowsHTML}
+    </div>`;
+  });
+
+  // Отзыв участника
+  const feedbackHTML = b.feedback ? `<div style="margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text);">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Ощущения от программы</div>
+    ${b.feedback}
+  </div>` : '';
+
+  return `<div class="point-b-section">
+    <div class="point-b-head">
+      <div class="point-b-title">📊 Точка Б — сравнение</div>
+      <div style="font-size:13px;font-weight:700;color:${overallColor};">${overallText}</div>
+    </div>
+    <div class="point-b-body">
+      <div class="overall-mini">
+        <div class="overall-mini-stat better"><div class="overall-mini-num">${dyn.better}</div><div class="overall-mini-lbl">Улучшилось</div></div>
+        <div class="overall-mini-stat worse"><div class="overall-mini-num">${dyn.worse}</div><div class="overall-mini-lbl">Ухудшилось</div></div>
+        <div class="overall-mini-stat same"><div class="overall-mini-num">${dyn.same}</div><div class="overall-mini-lbl">Без изменений</div></div>
+      </div>
+      ${weightHTML}
+      ${blocksHTML}
+      ${feedbackHTML}
+    </div>
   </div>`;
 }
 
