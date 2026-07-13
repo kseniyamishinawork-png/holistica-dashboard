@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Формула здоровья ЖКТ — Точка Б</title>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c1:#173f35;--c1l:#2a6b5a;--c1ll:#e8f5f1;
+  --c2:#9e007e;--c2l:#fdf0fa;--c2ll:rgba(158,0,126,.08);
+  --bg:#f4f7f5;--white:#ffffff;--text:#1a1a1a;--muted:#6b7280;--border:#e2ebe7;
+  --green:#16a34a;--greenbg:#f0fdf4;--greenborder:#bbf7d0;
+  --red:#dc2626;--redbg:#fef2f2;--redborder:#fecaca;
+  --amber:#d97706;--amberbg:#fffbeb;--amberborder:#fde68a;
+  --blue:#2563eb;--bluebg:#eff6ff;--blueborder:#bfdbfe;
+  --shadow:0 4px 28px rgba(23,63,53,.10);--shadow2:0 8px 40px rgba(23,63,53,.15);
+  --font:'Commissioner',sans-serif;--radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font);background:linear-gradient(135deg,#f0faf6 0%,#fdf6f0 50%,#f5eef8 100%);min-height:100vh;color:var(--text);font-size:16px;}
+
+.wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.screen{display:none;}
+.screen.on{display:block;animation:fadeup .35s ease;}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ИНТРО */
+.intro-card{background:var(--white);border-radius:28px;overflow:hidden;box-shadow:var(--shadow2);}
+.intro-hero{background:linear-gradient(135deg,var(--c2) 0%,#c4009c 100%);padding:44px 52px 36px;text-align:center;}
+.intro-eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:10px;}
+.intro-title{font-size:34px;font-weight:700;color:var(--white);line-height:1.2;}
+.intro-sub{font-size:16px;color:rgba(255,255,255,.7);margin-top:8px;}
+.intro-body{padding:36px 52px 44px;}
+.intro-text{font-size:16px;line-height:1.85;color:var(--text);margin-bottom:28px;}
+.intro-text p{margin-bottom:14px;}
+.intro-text p:last-child{margin-bottom:0;}
+.intro-text strong{color:var(--c1);font-weight:700;}
+.intro-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;}
+.intro-chip{background:var(--c1ll);color:var(--c1);border-radius:40px;padding:9px 22px;font-size:14px;font-weight:600;border:1px solid var(--border);}
+.btn-start{width:100%;padding:18px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--c2),#c4009c);color:var(--white);font-family:var(--font);font-size:17px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(158,0,126,.25);}
+.btn-start:hover{transform:translateY(-2px);}
+
+/* КАРТОЧКИ */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-head{padding:20px 36px;background:var(--c2);color:var(--white);}
+.card-head.dark{background:var(--c1);}
+.card-head-sub{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:600;margin-bottom:8px;}
+.card-head-title{font-size:20px;font-weight:700;line-height:1.3;}
+.card-body{padding:24px 36px;}
+
+/* ПОЛЯ */
+.field-wrap{margin-bottom:18px;}
+.field-label{display:block;font-size:14px;font-weight:700;color:var(--c1);margin-bottom:7px;}
+.field-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:11px;font-family:var(--font);font-size:15px;color:var(--text);background:var(--c1ll);outline:none;transition:border-color .2s;}
+.field-input:focus{border-color:var(--c2);background:var(--white);}
+.field-input.error{border-color:var(--red);background:var(--redbg);}
+.field-error{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+.field-error.show{display:block;}
+.field-textarea{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:11px;font-family:var(--font);font-size:15px;color:var(--text);background:var(--c1ll);outline:none;resize:vertical;min-height:90px;transition:border-color .2s;}
+.field-textarea:focus{border-color:var(--c2);background:var(--white);}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* СИМПТОМЫ — ОСНОВНОЙ БЛОК */
+.symptoms-section{margin-bottom:14px;}
+.symptoms-section-title{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--c2);font-weight:700;margin-bottom:10px;padding:0 4px;}
+
+.symptom-item{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:8px;transition:border-color .15s;}
+.symptom-item:last-child{margin-bottom:0;}
+.symptom-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.symptom-name{font-size:14px;font-weight:600;color:var(--text);flex:1;line-height:1.4;}
+.symptom-was{font-size:12px;color:var(--muted);background:var(--c1ll);border-radius:6px;padding:3px 8px;white-space:nowrap;flex-shrink:0;}
+
+.status-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.status-btn{padding:9px 6px;border:1.5px solid var(--border);border-radius:9px;background:var(--white);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .14s;text-align:center;line-height:1.3;color:var(--muted);}
+.status-btn:hover{transform:translateY(-1px);}
+.status-btn.sel-better{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+.status-btn.sel-worse{background:var(--redbg);border-color:var(--red);color:var(--red);}
+.status-btn.sel-same{background:var(--amberbg);border-color:var(--amber);color:var(--amber);}
+.status-btn.sel-gone{background:var(--bluebg);border-color:var(--blue);color:var(--blue);}
+
+/* НЕТ СИМПТОМОВ */
+.no-symptoms{text-align:center;padding:40px 20px;color:var(--muted);font-size:15px;}
+
+/* НАВИГАЦИЯ */
+.nav{display:flex;gap:12px;margin-top:24px;}
+.bprev{padding:14px 24px;border:2px solid var(--c1);border-radius:12px;background:transparent;color:var(--c1);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .16s;}
+.bprev:hover{background:var(--c1ll);}
+.bnext{flex:1;padding:14px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--c2),#c4009c);color:var(--white);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(158,0,126,.2);}
+.bnext:hover{transform:translateY(-2px);}
+.bsend{flex:1;padding:14px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c1l));color:var(--white);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(23,63,53,.2);}
+.bsend:hover{transform:translateY(-2px);}
+
+/* ИТОГОВЫЙ ЭКРАН */
+.results-wrap{display:flex;flex-direction:column;gap:16px;}
+.result-hero{background:linear-gradient(135deg,var(--c2),#c4009c);border-radius:24px;padding:32px 40px;text-align:center;color:var(--white);}
+.result-hero h2{font-size:26px;font-weight:700;margin-bottom:6px;}
+.result-hero p{font-size:15px;color:rgba(255,255,255,.75);}
+.result-name{font-size:18px;font-weight:600;margin-bottom:4px;}
+.overall-grid{background:var(--white);border-radius:16px;box-shadow:var(--shadow);padding:20px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.overall-stat{text-align:center;padding:14px 8px;border-radius:12px;}
+.overall-stat.better{background:var(--greenbg);}
+.overall-stat.worse{background:var(--redbg);}
+.overall-stat.same{background:var(--amberbg);}
+.overall-stat.gone{background:var(--bluebg);}
+.overall-num{font-size:32px;font-weight:700;line-height:1;}
+.overall-stat.better .overall-num{color:var(--green);}
+.overall-stat.worse .overall-num{color:var(--red);}
+.overall-stat.same .overall-num{color:var(--amber);}
+.overall-stat.gone .overall-num{color:var(--blue);}
+.overall-lbl{font-size:11px;color:var(--muted);font-weight:600;margin-top:4px;}
+
+.result-block{background:var(--white);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;}
+.result-block-head{padding:12px 20px;background:var(--c1ll);display:flex;justify-content:space-between;align-items:center;}
+.result-block-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--c1);}
+.result-row{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--c1ll);font-size:13px;}
+.result-row:last-child{border-bottom:none;}
+.result-symptom{flex:1;color:var(--text);line-height:1.4;}
+.result-was{font-size:11px;color:var(--muted);background:var(--c1ll);padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+.result-status{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.rs-better{background:var(--greenbg);color:var(--green);}
+.rs-worse{background:var(--redbg);color:var(--red);}
+.rs-same{background:var(--amberbg);color:var(--amber);}
+.rs-gone{background:var(--bluebg);color:var(--blue);}
+
+.weight-card{background:var(--white);border-radius:14px;box-shadow:var(--shadow);padding:20px 28px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.weight-item{text-align:center;}
+.weight-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px;}
+.weight-val{font-size:26px;font-weight:700;color:var(--c1);}
+.weight-diff{font-size:24px;font-weight:700;}
+
+.feedback-card{background:var(--white);border-radius:14px;box-shadow:var(--shadow);padding:20px 28px;}
+.feedback-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px;}
+.feedback-text{font-size:14px;line-height:1.7;color:var(--text);}
+
+.btn-edit{padding:12px 24px;border:2px solid var(--c2);border-radius:12px;background:transparent;color:var(--c2);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .16s;}
+.btn-edit:hover{background:var(--c2l);}
+
+/* OVERLAY */
+.overlay{display:none;position:fixed;inset:0;background:rgba(23,63,53,.4);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center;}
+.overlay.on{display:flex;}
+.overlay-box{background:var(--white);border-radius:20px;padding:40px 52px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.overlay-box h3{font-size:20px;font-weight:700;color:var(--c1);margin-bottom:6px;}
+.overlay-box p{color:var(--muted);font-size:14px;}
+.spinner{width:32px;height:32px;border:3px solid var(--c1ll);border-top-color:var(--c2);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:640px){
+  .wrap{padding:16px 12px 60px;}
+  .intro-hero,.intro-body,.card-head,.card-body{padding-left:20px;padding-right:20px;}
+  .intro-title{font-size:26px;}
+  .status-btns{grid-template-columns:1fr 1fr;}
+  .fields-grid{grid-template-columns:1fr;}
+  .overall-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <h3>Отправляем ответы...</h3>
+    <p>Это займёт несколько секунд</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ ЭКРАН 0 — ИНТРО ═══ -->
+<div class="screen on" id="s0">
+  <div class="intro-card">
+    <div class="intro-hero">
+      <div class="intro-eyebrow">Holistica DOC · Точка Б</div>
+      <div class="intro-title">Формула здоровья ЖКТ</div>
+      <div class="intro-sub">Финальная диагностика — сравниваем с началом пути</div>
+    </div>
+    <div class="intro-body">
+      <div class="intro-text">
+        <p>Вы прошли программу — теперь давайте посмотрим что изменилось. Мы покажем вам все симптомы которые вы отмечали в начале, и вы просто оцените каждый из них.</p>
+        <p><strong>Это займёт 3–5 минут</strong> — намного быстрее чем первичная анкета.</p>
+      </div>
+      <div class="intro-chips">
+        <div class="intro-chip">⏱ 3–5 минут</div>
+        <div class="intro-chip">📊 Сравнение А vs Б</div>
+        <div class="intro-chip">🔒 Конфиденциально</div>
+      </div>
+      <button class="btn-start" onclick="go(1)">Начать →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ЭКРАН 1 — EMAIL ═══ -->
+<div class="screen" id="s1">
+  <div class="card">
+    <div class="card-head dark">
+      <div class="card-head-sub">Шаг 1</div>
+      <div class="card-head-title">Введите ваш e-mail</div>
+    </div>
+    <div class="card-body">
+      <div class="field-wrap">
+        <label class="field-label">E-mail</label>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Тот же e-mail что вводили в начале программы — мы загрузим ваши исходные данные.</p>
+        <input class="field-input" id="f_email" type="email" placeholder="example@mail.ru" maxlength="150">
+        <div class="field-error" id="err_email">Введите e-mail</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="bprev" onclick="go(0)">← Назад</button>
+    <button class="bnext" id="btn-check" onclick="checkEmail()">Продолжить →</button>
+  </div>
+</div>
+
+<!-- ═══ ЭКРАН 2 — СИМПТОМЫ ═══ -->
+<div class="screen" id="s2">
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-sub">Шаг 2 — Симптомы</div>
+      <div class="card-head-title">Как вы себя чувствуете сейчас?</div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Ниже все симптомы которые вы отмечали в начале программы. Оцените каждый из них.</p>
+      <div id="symptoms-list">
+        <!-- Генерируется JS -->
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="bprev" onclick="go(1)">← Назад</button>
+    <button class="bnext" onclick="go(3)">Продолжить →</button>
+  </div>
+</div>
+
+<!-- ═══ ЭКРАН 3 — ДАННЫЕ ═══ -->
+<div class="screen" id="s3">
+  <div class="card">
+    <div class="card-head dark">
+      <div class="card-head-sub">Шаг 3 — Данные</div>
+      <div class="card-head-title">Ваши показатели сейчас</div>
+    </div>
+    <div class="card-body">
+      <div class="fields-grid">
+        <div class="field-wrap">
+          <label class="field-label">Вес (кг)</label>
+          <input class="field-input" id="f_ves" type="number" placeholder="60" oninput="calcBMI()">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Рост (см)</label>
+          <input class="field-input" id="f_rost" type="number" placeholder="165" oninput="calcBMI()">
+        </div>
+        <div class="field-wrap" style="grid-column:1/-1;">
+          <label class="field-label">Обхват талии (см)</label>
+          <input class="field-input" id="f_taliya" type="number" placeholder="75">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="bprev" onclick="go(2)">← Назад</button>
+    <button class="bnext" onclick="go(4)">Продолжить →</button>
+  </div>
+</div>
+
+<!-- ═══ ЭКРАН 4 — ЛЕКАРСТВА И ОЩУЩЕНИЯ ═══ -->
+<div class="screen" id="s4">
+  <div class="card">
+    <div class="card-head dark">
+      <div class="card-head-sub">Шаг 4 — Финал</div>
+      <div class="card-head-title">Лекарства и ощущения от программы</div>
+    </div>
+    <div class="card-body">
+      <div class="field-wrap">
+        <label class="field-label">Принимаете ли вы сейчас лекарства?</label>
+        <textarea class="field-textarea" id="f_meds" placeholder="Если изменилось — напишите что принимаете сейчас..." maxlength="600"></textarea>
+      </div>
+      <div class="field-wrap" style="margin-bottom:0;">
+        <label class="field-label">Ваши ощущения от программы</label>
+        <textarea class="field-textarea" id="f_feedback" placeholder="Что изменилось? Что улучшилось, что хотелось бы ещё проработать?" maxlength="1000"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="bprev" onclick="go(3)">← Назад</button>
+    <button class="bsend" onclick="sendData()">Отправить и увидеть результат ✓</button>
+  </div>
+</div>
+
+<!-- ═══ ЭКРАН 5 — РЕЗУЛЬТАТЫ ═══ -->
+<div class="screen" id="s5">
+  <div class="results-wrap" id="results-wrap"></div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjX2TFSxzvT7zNJNzS9LCuQeif3ncM8JCoBMMYxLJOl_2GsQZFUO3tBlllwaYiWjhTAA/exec';
+
+// Статусы
+const STATUSES = [
+  { key:'better', label:'Стало лучше', cls:'sel-better', res:'rs-better', emoji:'↓' },
+  { key:'gone',   label:'Прошло полностью', cls:'sel-gone',   res:'rs-gone',   emoji:'✓' },
+  { key:'same',   label:'Без изменений', cls:'sel-same',   res:'rs-same',   emoji:'→' },
+  { key:'worse',  label:'Стало хуже',  cls:'sel-worse',  res:'rs-worse',  emoji:'↑' },
+];
+
+// Маппинг поля → название блока
+const BLOCK_NAMES = {
+  s_boli:'Боли в животе', s_tyazhest:'Тяжесть и чувствительность',
+  s_izjoga:'Изжога и привкус', s_toshnota:'Тошнота',
+  s_vzdutie:'Вздутие', s_stul:'Стул',
+  s_kozha:'Кожа и волосы', s_obshchee:'Общее состояние',
+};
+const BLOCK_FIELDS = ['s_boli','s_tyazhest','s_izjoga','s_toshnota','s_vzdutie','s_stul','s_kozha','s_obshchee'];
+
+let dataA = null;
+let existingRowIndex = null;
+let symptoms = []; // [{field, name, wasVal, status}]
+let B = {}; // данные точки Б
+
+document.addEventListener('DOMContentLoaded', () => { go(0); });
+
+function go(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById('s' + n).classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function calcBMI() {
+  const h = parseFloat(document.getElementById('f_rost').value);
+  const w = parseFloat(document.getElementById('f_ves').value);
+  if (h > 0 && w > 0) B.bmi = (w / ((h / 100) ** 2)).toFixed(1);
+}
+
+/* ── ПАРСИНГ СИМПТОМОВ ── */
+function parseBlock(str) {
+  if (!str) return [];
+  return String(str).split(/\r?\n/).filter(Boolean).map(line => {
+    const idx = line.indexOf(':');
+    if (idx > -1) return { name: line.substring(0, idx).trim(), val: line.substring(idx + 1).trim() };
+    return { name: line.trim(), val: '' };
+  }).filter(s => s.name);
+}
+
+// Получить значение поля из dataA — пробуем несколько вариантов ключа
+function getFieldA(aData, field) {
+  if (!aData) return '';
+  // Прямое совпадение
+  if (aData[field]) return aData[field];
+  // Варианты для блоков симптомов
+  const variants = {
+    s_boli:     ['s_boli', 'boli_v_zhivote', 'blok_3_boli_v_zhivote', 'блок_3_боли_в_животе'],
+    s_tyazhest: ['s_tyazhest', 'tyazhest', 'blok_4', 'блок_4'],
+    s_izjoga:   ['s_izjoga', 'izjoga', 'blok_5', 'блок_5'],
+    s_toshnota: ['s_toshnota', 'toshnota', 'blok_6', 'блок_6'],
+    s_vzdutie:  ['s_vzdutie', 'vzdutie', 'blok_7', 'блок_7'],
+    s_stul:     ['s_stul', 'stul', 'blok_8', 'блок_8'],
+    s_kozha:    ['s_kozha', 'kozha', 'blok_9', 'блок_9'],
+    s_obshchee: ['s_obshchee', 'obshchee', 'blok_10', 'блок_10'],
+  };
+  const keys = variants[field] || [];
+  for (const k of keys) {
+    if (aData[k]) return aData[k];
+  }
+  // Поиск по частичному совпадению ключа
+  const fieldLower = field.toLowerCase();
+  for (const k of Object.keys(aData)) {
+    if (k.toLowerCase().includes(fieldLower.replace('s_', '')) && aData[k]) {
+      return aData[k];
+    }
+  }
+  return '';
+}
+
+/* ── ПРОВЕРКА EMAIL ── */
+async function checkEmail() {
+  const emailEl = document.getElementById('f_email');
+  const email = emailEl.value.trim();
+  if (!email) {
+    emailEl.classList.add('error');
+    document.getElementById('err_email').textContent = 'Введите e-mail';
+    document.getElementById('err_email').classList.add('show');
+    return;
+  }
+  emailEl.classList.remove('error');
+  document.getElementById('err_email').classList.remove('show');
+
+  const btn = document.getElementById('btn-check');
+  btn.textContent = 'Проверка...';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + '?action=check_email_b&email=' + encodeURIComponent(email));
+    const data = await r.json();
+    btn.textContent = 'Продолжить →';
+    btn.disabled = false;
+    B.email = email;
+
+    if (!data.dataA) {
+      emailEl.classList.add('error');
+      document.getElementById('err_email').textContent = 'К сожалению, вы не заполнили точку А. Пожалуйста, сначала пройдите первичную диагностику.';
+      document.getElementById('err_email').classList.add('show');
+      return;
+    }
+
+    dataA = data.dataA;
+
+    if (data.exists) {
+      existingRowIndex = data.rowIndex;
+      // Восстанавливаем статусы из сохранённых данных если есть
+      buildSymptomList(dataA);
+      if (data.dataB && data.dataB.statuses_json) {
+        try {
+          const saved = JSON.parse(data.dataB.statuses_json);
+          symptoms.forEach(s => { if (saved[s.name]) s.status = saved[s.name]; });
+        } catch(e) {}
+      }
+      renderSymptomList();
+      showResults(dataA, data.dataB || {}, email, data.fio || '');
+    } else {
+      buildSymptomList(dataA);
+      renderSymptomList();
+      go(2);
+    }
+  } catch(e) {
+    btn.textContent = 'Продолжить →';
+    btn.disabled = false;
+    B.email = email;
+    go(2);
+  }
+}
+
+/* ── СТРОИМ СПИСОК СИМПТОМОВ ── */
+function buildSymptomList(aData) {
+  symptoms = [];
+  console.log('dataA keys:', Object.keys(aData || {}));
+  BLOCK_FIELDS.forEach(field => {
+    const raw = getFieldA(aData, field);
+    console.log(field, '->', raw ? raw.substring(0,50) : 'EMPTY');
+    const items = parseBlock(raw);
+    items.forEach(item => {
+      symptoms.push({ field, blockName: BLOCK_NAMES[field], name: item.name, wasVal: item.val, status: null });
+    });
+  });
+  console.log('Total symptoms:', symptoms.length);
+}
+
+/* ── РЕНДЕРИМ СПИСОК ── */
+function renderSymptomList() {
+  const container = document.getElementById('symptoms-list');
+  if (!symptoms.length) {
+    container.innerHTML = `<div class="no-symptoms">В точке А симптомы не были отмечены</div>`;
+    return;
+  }
+
+  // Группируем по блокам
+  const byBlock = {};
+  symptoms.forEach(s => {
+    if (!byBlock[s.blockName]) byBlock[s.blockName] = [];
+    byBlock[s.blockName].push(s);
+  });
+
+  let html = '';
+  Object.entries(byBlock).forEach(([blockName, items]) => {
+    html += `<div class="symptoms-section">
+      <div class="symptoms-section-title">${blockName}</div>`;
+
+    items.forEach((s, globalIdx) => {
+      const idx = symptoms.indexOf(s);
+      html += `<div class="symptom-item" id="si-${idx}">
+        <div class="symptom-top">
+          <div class="symptom-name">${s.name}</div>
+          ${s.wasVal ? `<div class="symptom-was">Было: ${s.wasVal}</div>` : ''}
+        </div>
+        <div class="status-btns">
+          ${STATUSES.map(st => `<button class="status-btn${s.status === st.key ? ' '+st.cls : ''}" onclick="setStatus(${idx},'${st.key}')">${st.emoji} ${st.label}</button>`).join('')}
+        </div>
+      </div>`;
+    });
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+/* ── СТАТУС СИМПТОМА ── */
+function setStatus(idx, key) {
+  symptoms[idx].status = key;
+  const item = document.getElementById('si-' + idx);
+  if (!item) return;
+  const btns = item.querySelectorAll('.status-btn');
+  btns.forEach((btn, i) => {
+    btn.className = 'status-btn';
+    if (STATUSES[i].key === key) btn.classList.add(STATUSES[i].cls);
+  });
+}
+
+/* ── ОТПРАВКА ── */
+async function sendData() {
+  B.ves    = document.getElementById('f_ves').value;
+  B.rost   = document.getElementById('f_rost').value;
+  B.taliya = document.getElementById('f_taliya').value;
+  B.meds   = document.getElementById('f_meds').value;
+  B.feedback = document.getElementById('f_feedback').value;
+  calcBMI();
+
+  // Собираем статусы в JSON для хранения
+  const statusesMap = {};
+  symptoms.forEach(s => { if (s.status) statusesMap[s.name] = s.status; });
+
+  // Собираем симптомы по блокам для таблицы
+  const byField = {};
+  BLOCK_FIELDS.forEach(f => { byField[f] = []; });
+  symptoms.forEach(s => {
+    if (s.status) {
+      const st = STATUSES.find(x => x.key === s.status);
+      byField[s.field].push(`${s.name}: ${st ? st.label : s.status}${s.wasVal ? ' (было: '+s.wasVal+')' : ''}`);
+    }
+  });
+
+  const payload = {
+    action: 'save_b',
+    email: B.email || '',
+    rost: parseFloat(B.rost) || '',
+    ves: parseFloat(B.ves) || '',
+    bmi: B.bmi || '',
+    taliya: parseFloat(B.taliya) || '',
+    s_boli:     byField.s_boli.join('\r\n'),
+    s_tyazhest: byField.s_tyazhest.join('\r\n'),
+    s_izjoga:   byField.s_izjoga.join('\r\n'),
+    s_toshnota: byField.s_toshnota.join('\r\n'),
+    s_vzdutie:  byField.s_vzdutie.join('\r\n'),
+    bloating_products: '',
+    s_stul:     byField.s_stul.join('\r\n'),
+    s_kozha:    byField.s_kozha.join('\r\n'),
+    s_obshchee: byField.s_obshchee.join('\r\n'),
+    meds: B.meds || '',
+    feedback: B.feedback || '',
+    statuses_json: JSON.stringify(statusesMap),
+    symptoms_all: symptoms.filter(s=>s.status).map(s=>{
+      const st=STATUSES.find(x=>x.key===s.status);
+      return `${s.name}: ${st?st.label:s.status}`;
+    }).join('\r\n'),
+    rowIndex: existingRowIndex || '',
+    timestamp: new Date().toISOString(),
+  };
+
+  document.getElementById('overlay').classList.add('on');
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+  document.getElementById('overlay').classList.remove('on');
+  showResults(dataA, B, B.email, '');
+}
+
+/* ── РЕЗУЛЬТАТЫ ── */
+function showResults(aData, bData, email, fio) {
+  let better = 0, worse = 0, same = 0, gone = 0;
+
+  symptoms.forEach(s => {
+    if (s.status === 'better') better++;
+    else if (s.status === 'worse') worse++;
+    else if (s.status === 'same') same++;
+    else if (s.status === 'gone') gone++;
+  });
+
+  // Если пришли сохранённые данные и статусов нет — пробуем восстановить из statuses_json
+  if (!symptoms.length && bData && bData.statuses_json) {
+    try {
+      const saved = JSON.parse(bData.statuses_json);
+      buildSymptomList(aData);
+      symptoms.forEach(s => { if (saved[s.name]) s.status = saved[s.name]; });
+      symptoms.forEach(s => {
+        if (s.status === 'better') better++;
+        else if (s.status === 'worse') worse++;
+        else if (s.status === 'same') same++;
+        else if (s.status === 'gone') gone++;
+      });
+    } catch(e) {}
+  }
+
+  const overallText = (better + gone) > worse
+    ? '🎉 Положительная динамика!'
+    : worse > (better + gone)
+    ? 'Есть моменты для работы'
+    : 'Стабильное состояние';
+
+  // Изменение веса
+  let weightHTML = '';
+  const aVes = aData ? parseFloat(aData.ves) : 0;
+  const bVes = parseFloat(bData.ves || B.ves || 0);
+  if (aVes && bVes) {
+    const diff = (bVes - aVes).toFixed(1);
+    const wcolor = diff < 0 ? 'var(--green)' : diff > 0 ? 'var(--red)' : 'var(--amber)';
+    const sign = diff > 0 ? '+' : '';
+    weightHTML = `<div class="weight-card">
+      <div class="weight-item"><div class="weight-label">Вес А</div><div class="weight-val">${aVes} кг</div></div>
+      <div class="weight-diff" style="color:${wcolor};">${sign}${diff} кг</div>
+      <div class="weight-item"><div class="weight-label">Вес Б</div><div class="weight-val" style="color:${wcolor};">${bVes} кг</div></div>
+    </div>`;
+  }
+
+  // Блоки по симптомам
+  const byBlock = {};
+  symptoms.forEach(s => {
+    if (!byBlock[s.blockName]) byBlock[s.blockName] = [];
+    byBlock[s.blockName].push(s);
+  });
+
+  const blocksHTML = Object.entries(byBlock).map(([blockName, items]) => {
+    const rowsHTML = items.map(s => {
+      if (!s.status) return '';
+      const st = STATUSES.find(x => x.key === s.status);
+      return `<div class="result-row">
+        <div class="result-symptom">${s.name}</div>
+        ${s.wasVal ? `<div class="result-was">${s.wasVal}</div>` : ''}
+        <div class="result-status ${st ? st.res : ''}">${st ? st.emoji + ' ' + st.label : s.status}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+    if (!rowsHTML) return '';
+    return `<div class="result-block">
+      <div class="result-block-head"><div class="result-block-title">${blockName}</div></div>
+      ${rowsHTML}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  // Отзыв
+  const feedbackText = bData.feedback || B.feedback || '';
+  const feedbackHTML = feedbackText ? `<div class="feedback-card">
+    <div class="feedback-label">Ощущения от программы</div>
+    <div class="feedback-text">${feedbackText}</div>
+  </div>` : '';
+
+  document.getElementById('results-wrap').innerHTML = `
+    <div class="result-hero">
+      <div class="result-name">${fio || email || B.email}</div>
+      <h2>Ваши результаты: А vs Б</h2>
+      <p>${overallText}</p>
+    </div>
+
+    <div class="overall-grid">
+      <div class="overall-stat gone"><div class="overall-num">${gone}</div><div class="overall-lbl">Прошло</div></div>
+      <div class="overall-stat better"><div class="overall-num">${better}</div><div class="overall-lbl">Улучшилось</div></div>
+      <div class="overall-stat same"><div class="overall-num">${same}</div><div class="overall-lbl">Без изменений</div></div>
+      <div class="overall-stat worse"><div class="overall-num">${worse}</div><div class="overall-lbl">Ухудшилось</div></div>
+    </div>
+
+    ${weightHTML}
+    ${blocksHTML || '<div style="background:var(--white);border-radius:14px;padding:24px;text-align:center;color:var(--muted);font-size:14px;box-shadow:var(--shadow);">Статусы не выбраны</div>'}
+    ${feedbackHTML}
+
+    <div style="text-align:center;padding:8px 0 16px;">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:10px;">Хотите скорректировать ответы?</p>
+      <button class="btn-edit" onclick="go(2)">✏️ Скорректировать ответы</button>
+    </div>
+  `;
+
+  go(5);
+}
+</script>
+</body>
+</html>
